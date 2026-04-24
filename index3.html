@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Just Add — Sistem Manajemen Restoran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --amber: #2563EB;
+    --amber-light: #3B82F6;
+    --amber-pale: #EFF6FF;
+    --cream: #F8FAFF;
+    --dark: #0A0F1E;
+    --dark-2: #111827;
+    --dark-3: #1E293B;
+    --text-muted: #64748B;
+    --text-body: #1E293B;
+    --border: rgba(37, 99, 235, 0.15);
+    --border-hover: rgba(37, 99, 235, 0.4);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-body);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.25rem 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(248,250,255,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    text-decoration: none; font-size: 0.9rem; font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--amber); }
+  .nav-cta {
+    background: var(--amber); color: #fff;
+    border: none; padding: 0.6rem 1.4rem;
+    border-radius: 100px; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: var(--dark-3); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    padding: 9rem 5% 5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -80px; right: -120px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: 0; left: 10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--amber-pale); color: var(--amber);
+    padding: 0.35rem 0.9rem; border-radius: 100px;
+    font-size: 0.82rem; font-weight: 600;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-tag .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--amber); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-weight: 700; line-height: 1.15;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero h1 em { font-style: italic; color: var(--amber); }
+  .hero p {
+    font-size: 1.1rem; color: var(--text-muted);
+    line-height: 1.75; max-width: 480px;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-buttons {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .btn-primary {
+    background: var(--amber); color: white;
+    border: none; padding: 0.85rem 2rem;
+    border-radius: 100px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,99,235,0.3); }
+  .btn-ghost {
+    background: transparent; color: var(--text-body);
+    border: 1.5px solid var(--border-hover);
+    padding: 0.85rem 2rem;
+    border-radius: 100px; font-size: 1rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  /* ── HERO VISUAL ── */
+  .hero-visual {
+    position: relative;
+    animation: fadeRight 0.8s 0.2s ease both;
+  }
+  .dashboard-card {
+    background: var(--dark);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 32px 80px rgba(10,15,30,0.25);
+    transform: perspective(1000px) rotateY(-5deg) rotateX(3deg);
+    transition: transform 0.4s ease;
+  }
+  .dashboard-card:hover {
+    transform: perspective(1000px) rotateY(-2deg) rotateX(1deg);
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .card-header-left { font-family: 'Playfair Display', serif; color: #EFF6FF; font-size: 1rem; }
+  .card-badge { background: rgba(59,130,246,0.2); color: #3B82F6; padding: 0.25rem 0.7rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
+  .chart-bars {
+    display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-bottom: 1.2rem;
+  }
+  .bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: rgba(59,130,246,0.3);
+    position: relative; overflow: hidden;
+    animation: barGrow 1s 0.5s ease both;
+    transform-origin: bottom;
+  }
+  .bar.active { background: var(--amber-light); }
+  .bar-label { color: #64748B; font-size: 0.65rem; }
+  @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+  }
+  .stat-box {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(59,130,246,0.15);
+    border-radius: 10px; padding: 0.75rem;
+  }
+  .stat-box .stat-label { color: #64748B; font-size: 0.7rem; margin-bottom: 0.3rem; }
+  .stat-box .stat-value { color: #EFF6FF; font-size: 1.1rem; font-weight: 600; }
+  .stat-box .stat-value span { color: #34D399; font-size: 0.7rem; font-weight: 400; }
+
+  /* floating badges */
+  .float-badge {
+    position: absolute;
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.6rem 0.9rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8rem; font-weight: 500;
+    animation: float 3s ease-in-out infinite;
+  }
+  .float-badge .icon { font-size: 1rem; }
+  .float-badge-1 { top: -20px; left: -30px; animation-delay: 0s; }
+  .float-badge-2 { bottom: 30px; right: -20px; animation-delay: 1.5s; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+  @keyframes fadeRight { from { opacity:0; transform:translateX(32px); } to { opacity:1; transform:none; } }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    background: var(--dark);
+    padding: 2.5rem 5%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  .strip-item { text-align: center; }
+  .strip-item .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; color: var(--amber-light); font-weight: 700;
+  }
+  .strip-item .lbl { color: #64748B; font-size: 0.85rem; margin-top: 0.25rem; }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 6rem 5%; }
+  .section-tag {
+    display: inline-block; background: var(--amber-pale);
+    color: var(--amber); padding: 0.3rem 0.8rem; border-radius: 100px;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: var(--dark); font-weight: 700; line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  .section-title em { font-style: italic; color: var(--amber); }
+  .section-sub {
+    font-size: 1.05rem; color: var(--text-muted);
+    line-height: 1.7; max-width: 520px;
+  }
+
+  /* ── FEATURES (FRONTEND) ── */
+  .features { background: white; }
+  .features-grid {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .feat-card {
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.75rem;
+    transition: all 0.25s;
+    position: relative; overflow: hidden;
+    background: var(--cream);
+  }
+  .feat-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feat-card:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: 0 12px 36px rgba(37,99,235,0.1); }
+  .feat-card:hover::before { opacity: 1; }
+  .feat-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--amber-pale); color: var(--amber);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.1rem;
+  }
+  .feat-card h3 { font-size: 1.05rem; font-weight: 600; color: var(--dark); margin-bottom: 0.6rem; }
+  .feat-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; }
+  .feat-pill {
+    display: inline-block; margin-top: 1rem;
+    background: var(--amber-pale); color: var(--amber);
+    padding: 0.25rem 0.7rem; border-radius: 100px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+
+  /* ── BACKEND SECTION ── */
+  .backend { background: var(--cream); }
+  .backend-layout {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .backend-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .be-card {
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: white; border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.25rem 1.5rem;
+    transition: all 0.2s;
+  }
+  .be-card:hover { border-color: var(--border-hover); box-shadow: 0 6px 20px rgba(37,99,235,0.08); transform: translateX(4px); }
+  .be-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--dark); color: var(--amber-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .be-card h4 { font-size: 0.95rem; font-weight: 600; color: var(--dark); margin-bottom: 0.3rem; }
+  .be-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+  .be-fields { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+  .field-tag {
+    background: var(--amber-pale); color: var(--amber);
+    padding: 0.2rem 0.55rem; border-radius: 6px;
+    font-size: 0.72rem; font-weight: 500; font-family: monospace;
+  }
+
+  /* backend illustration */
+  .backend-visual { position: relative; }
+  .flow-diagram {
+    background: var(--dark); border-radius: 20px;
+    padding: 2rem; box-shadow: 0 24px 64px rgba(10,15,30,0.2);
+  }
+  .flow-title { font-family: 'Playfair Display', serif; color: #EFF6FF; font-size: 0.9rem; margin-bottom: 1.5rem; text-align: center; }
+  .flow-nodes {
+    display: flex; flex-direction: column; gap: 0.75rem;
+    align-items: stretch;
+  }
+  .flow-node {
+    display: flex; align-items: center; gap: 0.75rem;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(59,130,246,0.15);
+    border-radius: 10px; padding: 0.75rem 1rem;
+  }
+  .flow-node-icon { font-size: 1.1rem; }
+  .flow-node-info { flex: 1; }
+  .flow-node-name { color: #EFF6FF; font-size: 0.85rem; font-weight: 500; }
+  .flow-node-desc { color: #64748B; font-size: 0.72rem; }
+  .flow-arrow { text-align: center; color: var(--amber); font-size: 1.2rem; line-height: 1; }
+  .flow-node-status { padding: 0.2rem 0.55rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; }
+  .status-active { background: rgba(52,211,153,0.15); color: #34D399; }
+  .status-api { background: rgba(59,130,246,0.15); color: #3B82F6; }
+
+  /* ── WORKFLOW ── */
+  .workflow { background: white; }
+  .workflow-steps {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0; position: relative;
+  }
+  .workflow-steps::before {
+    content: ''; position: absolute; top: 28px; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--amber-pale), var(--amber), var(--amber-pale));
+  }
+  .step {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; padding: 0 1.5rem 1.5rem;
+    position: relative;
+  }
+  .step-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--amber); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 700; font-family: 'Playfair Display', serif;
+    margin-bottom: 1.25rem; position: relative; z-index: 1;
+    box-shadow: 0 0 0 6px var(--amber-pale);
+  }
+  .step-inactive .step-num { background: white; color: var(--text-muted); border: 2px solid var(--border); box-shadow: 0 0 0 6px white; }
+  .step h4 { font-size: 0.95rem; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; }
+  .step p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--dark);
+    padding: 6rem 5%;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 65%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cta-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    color: #EFF6FF; font-weight: 700;
+    line-height: 1.2; margin-bottom: 1.25rem;
+    position: relative;
+  }
+  .cta-section h2 em { font-style: italic; color: var(--amber-light); }
+  .cta-section p { color: #64748B; font-size: 1.05rem; line-height: 1.7; margin-bottom: 2.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-cta-light {
+    background: var(--amber); color: white;
+    border: none; padding: 0.9rem 2.5rem;
+    border-radius: 100px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-cta-light:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(59,130,246,0.4); }
+  .btn-cta-ghost {
+    background: transparent; color: #EFF6FF;
+    border: 1.5px solid rgba(59,130,246,0.4);
+    padding: 0.9rem 2.5rem;
+    border-radius: 100px; font-size: 1rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-cta-ghost:hover { border-color: var(--amber-light); color: var(--amber-light); }
+
+  /* ── FOOTER ── */
+  /* ── PRICING ── */
+  .pricing { background: var(--cream); }
+  .pricing-grid {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    max-width: 860px;
+    margin-left: auto; margin-right: auto;
+  }
+  .price-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .price-card.popular {
+    border: 2px solid var(--amber);
+    box-shadow: 0 12px 40px rgba(37,99,235,0.12);
+  }
+  .popular-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--amber); color: white;
+    padding: 0.3rem 1.2rem; border-radius: 100px;
+    font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  .price-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(37,99,235,0.1); }
+  .price-plan { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); margin-bottom: 0.75rem; }
+  .price-amount { display: flex; align-items: baseline; gap: 4px; margin-bottom: 0.5rem; }
+  .price-amount .currency { font-size: 1rem; font-weight: 600; color: var(--text-body); }
+  .price-amount .amount { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 700; color: var(--dark); line-height: 1; }
+  .price-amount .period { font-size: 0.85rem; color: var(--text-muted); }
+  .price-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+  .price-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 2rem; }
+  .price-features li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.88rem; color: var(--text-body); }
+  .price-features li .check { width: 18px; height: 18px; border-radius: 50%; background: var(--amber-pale); color: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0; }
+  .price-features li .check-x { width: 18px; height: 18px; border-radius: 50%; background: #F1F5F9; color: #94A3B8; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; }
+  .price-btn {
+    display: block; text-align: center; width: 100%;
+    padding: 0.75rem; border-radius: 100px;
+    font-size: 0.9rem; font-weight: 600;
+    text-decoration: none; transition: all 0.2s;
+    border: 1.5px solid var(--border-hover); color: var(--amber);
+    background: transparent;
+  }
+  .price-btn:hover { background: var(--amber-pale); }
+  .price-btn.filled { background: var(--amber); color: white; border-color: var(--amber); }
+  .price-btn.filled:hover { background: var(--dark); border-color: var(--dark); }
+
+  /* ── TEAM ── */
+  .team { background: white; }
+  .team-grid {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 700px;
+    margin-left: auto; margin-right: auto;
+  }
+  .team-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.25s;
+  }
+  .team-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(37,99,235,0.1); border-color: var(--border-hover); }
+  .team-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--dark);
+    border: 3px solid var(--amber);
+    margin: 0 auto 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700; color: #EFF6FF;
+  }
+  .team-name { font-size: 1.05rem; font-weight: 600; color: var(--dark); margin-bottom: 0.3rem; }
+  .team-role { font-size: 0.82rem; color: var(--amber); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+  .team-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; }
+  .team-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; justify-content: center; }
+  .team-skill { background: var(--amber-pale); color: var(--amber); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
+
+  @media (max-width: 580px) {
+    .team-grid { grid-template-columns: 1fr; }
+  }
+
+  footer {
+    background: #110D05; padding: 2rem 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-logo { font-family: 'Playfair Display', serif; color: #EFF6FF; font-size: 1.2rem; }
+  .footer-logo span { color: var(--amber); }
+  footer p { color: #1E293B; font-size: 0.82rem; }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: #1E293B; text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--amber); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 3rem; padding: 8rem 5% 4rem; }
+    .hero-visual { display: none; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .backend-layout { grid-template-columns: 1fr; }
+    .workflow-steps::before { display: none; }
+    .workflow-steps { gap: 1.5rem; }
+    .step { flex-direction: row; text-align: left; gap: 1rem; }
+    .step-num { margin-bottom: 0; flex-shrink: 0; }
+    nav .nav-links { display: none; }
+  }
+  @media (max-width: 580px) {
+    .stats-strip { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Just<span>Add</span></div>
+  <div class="nav-links">
+    <a href="#features">Fitur</a>
+    <a href="#backend">Backend</a>
+    <a href="#alur">Alur Kerja</a>
+    <a href="#cta">Demo</a>
+  </div>
+
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      Sistem Manajemen Restoran
+    </div>
+    <h1>Kelola Restoran Anda dengan <em>Lebih Cerdas</em></h1>
+    <p>Just Add hadir sebagai solusi lengkap — dari manajemen menu, pemrosesan order, hingga laporan penjualan. Semua dalam satu platform yang intuitif dan terintegrasi.</p>
+
+  </div>
+
+  <div class="hero-visual">
+    <div class="float-badge float-badge-1">
+      <span class="icon">📦</span>
+      <span>15 Order Baru</span>
+    </div>
+    <div class="dashboard-card">
+      <div class="card-header">
+        <div class="card-header-left">Chart Penjualan</div>
+        <div class="card-badge">Hari ini</div>
+      </div>
+      <div class="chart-bars">
+        <div class="bar-group">
+          <div class="bar" style="height: 55%"></div>
+          <div class="bar-label">Sen</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height: 75%"></div>
+          <div class="bar-label">Sel</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height: 60%"></div>
+          <div class="bar-label">Rab</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar active" style="height: 95%"></div>
+          <div class="bar-label">Kam</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height: 80%"></div>
+          <div class="bar-label">Jum</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height: 70%"></div>
+          <div class="bar-label">Sab</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height: 45%"></div>
+          <div class="bar-label">Min</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Pendapatan</div>
+          <div class="stat-value">Rp 4.2jt <span>▲ 12%</span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Total Order</div>
+          <div class="stat-value">128 <span>▲ 8%</span></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Menu Aktif</div>
+          <div class="stat-value">34</div>
+        </div>
+      </div>
+    </div>
+    <div class="float-badge float-badge-2">
+      <span class="icon">✅</span>
+      <span>Order Dikonfirmasi</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="strip-item">
+    <div class="num">500+</div>
+    <div class="lbl">Restoran Aktif</div>
+  </div>
+  <div class="strip-item">
+    <div class="num">12rb+</div>
+    <div class="lbl">Order Diproses Harian</div>
+  </div>
+  <div class="strip-item">
+    <div class="num">99.9%</div>
+    <div class="lbl">Uptime Sistem</div>
+  </div>
+  <div class="strip-item">
+    <div class="num">4.9★</div>
+    <div class="lbl">Rating Pengguna</div>
+  </div>
+</div>
+
+<!-- FEATURES (FRONTEND) -->
+<section class="features" id="features">
+  <div class="section-tag">Frontend</div>
+  <h2 class="section-title">Antarmuka yang <em>Intuitif</em></h2>
+  <p class="section-sub">Semua yang dibutuhkan tim operasional Anda tersedia dalam tampilan yang bersih, responsif, dan mudah digunakan.</p>
+
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <h3>Dashboard & Chart Penjualan</h3>
+      <p>Pantau performa bisnis secara real-time dengan grafik penjualan harian, mingguan, dan bulanan yang interaktif.</p>
+      <span class="feat-pill">Visualisasi Data</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🍽️</div>
+      <h3>List Menu</h3>
+      <p>Kelola daftar menu dengan mudah — tambah, edit, atau nonaktifkan item sesuai ketersediaan bahan baku secara instan.</p>
+      <span class="feat-pill">CRUD Menu</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🧾</div>
+      <h3>Konfirmasi Order</h3>
+      <p>Notifikasi order masuk secara langsung. Tim kasir dan dapur dapat mengonfirmasi, menolak, atau memproses pesanan dalam satu klik.</p>
+      <span class="feat-pill">Real-time</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔗</div>
+      <h3>Integrasi API — Submit Order</h3>
+      <p>Terhubung langsung ke backend melalui API yang terstruktur. Setiap order yang disubmit tercatat secara akurat dan aman.</p>
+      <span class="feat-pill">REST API</span>
+    </div>
+  </div>
+</section>
+
+<!-- BACKEND SECTION -->
+<section class="backend" id="backend">
+  <div class="section-tag">Backend</div>
+  <h2 class="section-title">Fondasi <em>Solid</em> di Balik Layar</h2>
+  <p class="section-sub">Tiga modul utama backend yang mengelola seluruh data bisnis Anda dengan terstruktur dan aman.</p>
+
+  <div class="backend-layout">
+    <div class="backend-cards">
+      <div class="be-card">
+        <div class="be-icon">🧱</div>
+        <div>
+          <h4>Material</h4>
+          <p>Kelola bahan baku dan inventaris dengan form input yang lengkap. Lacak stok secara otomatis untuk mencegah kehabisan bahan.</p>
+          <div class="be-fields">
+            <span class="field-tag">nama</span>
+            <span class="field-tag">satuan</span>
+            <span class="field-tag">stok</span>
+            <span class="field-tag">harga_beli</span>
+            <span class="field-tag">kategori</span>
+          </div>
+        </div>
+      </div>
+      <div class="be-card">
+        <div class="be-icon">🍔</div>
+        <div>
+          <h4>Product</h4>
+          <p>Manajemen produk/menu dari sisi backend. Tentukan bahan yang dipakai, harga jual, dan informasi produk lainnya.</p>
+          <div class="be-fields">
+            <span class="field-tag">nama_produk</span>
+            <span class="field-tag">harga_jual</span>
+            <span class="field-tag">deskripsi</span>
+            <span class="field-tag">gambar</span>
+            <span class="field-tag">status</span>
+          </div>
+        </div>
+      </div>
+      <div class="be-card">
+        <div class="be-icon">💳</div>
+        <div>
+          <h4>Transactions</h4>
+          <p>Rekap seluruh transaksi penjualan. Setiap order tercatat lengkap dengan detail item, total pembayaran, dan waktu transaksi.</p>
+          <div class="be-fields">
+            <span class="field-tag">id_transaksi</span>
+            <span class="field-tag">total</span>
+            <span class="field-tag">metode_bayar</span>
+            <span class="field-tag">waktu</span>
+            <span class="field-tag">status</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="backend-visual">
+      <div class="flow-diagram">
+        <div class="flow-title">Alur Data Backend</div>
+        <div class="flow-nodes">
+          <div class="flow-node">
+            <span class="flow-node-icon">🧱</span>
+            <div class="flow-node-info">
+              <div class="flow-node-name">Material Module</div>
+              <div class="flow-node-desc">Input & manajemen bahan baku</div>
+            </div>
+            <span class="flow-node-status status-active">Aktif</span>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-node">
+            <span class="flow-node-icon">🍔</span>
+            <div class="flow-node-info">
+              <div class="flow-node-name">Product Module</div>
+              <div class="flow-node-desc">Mapping produk ke material</div>
+            </div>
+            <span class="flow-node-status status-active">Aktif</span>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-node">
+            <span class="flow-node-icon">🔗</span>
+            <div class="flow-node-info">
+              <div class="flow-node-name">API Submit Order</div>
+              <div class="flow-node-desc">Endpoint penerimaan pesanan</div>
+            </div>
+            <span class="flow-node-status status-api">REST API</span>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-node">
+            <span class="flow-node-icon">💳</span>
+            <div class="flow-node-info">
+              <div class="flow-node-name">Transactions Module</div>
+              <div class="flow-node-desc">Rekap & laporan keuangan</div>
+            </div>
+            <span class="flow-node-status status-active">Aktif</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="workflow" id="alur">
+  <div style="text-align: center;">
+    <div class="section-tag">Cara Kerja</div>
+    <h2 class="section-title" style="max-width: 480px; margin: 0 auto 1rem;">Dari Order Masuk <em>hingga Lunas</em></h2>
+    <p class="section-sub" style="margin: 0 auto;">Empat langkah sederhana yang menggerakkan seluruh operasional restoran Anda.</p>
+  </div>
+
+  <div class="workflow-steps" style="margin-top: 4rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <h4>Customer Order</h4>
+        <p>Pelanggan memilih menu dan melakukan pemesanan melalui antarmuka frontend.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <h4>Submit via API</h4>
+        <p>Order dikirim ke backend melalui API terintegrasi dan tersimpan di database.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <h4>Konfirmasi & Proses</h4>
+        <p>Staff mengkonfirmasi order di dashboard dan dapur mulai memproses pesanan.</p>
+      </div>
+    </div>
+    <div class="step step-inactive">
+      <div class="step-num">4</div>
+      <div>
+        <h4>Transaksi Tercatat</h4>
+        <p>Setelah pembayaran, transaksi otomatis tersimpan untuk laporan dan analitik.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="harga">
+  <div style="text-align: center;">
+    <div class="section-tag">Harga</div>
+    <h2 class="section-title" style="max-width: 480px; margin: 0 auto 1rem;">Pilih Paket yang <em>Sesuai Kebutuhan</em></h2>
+    <p class="section-sub" style="margin: 0 auto;">Harga transparan, tanpa biaya tersembunyi.</p>
+  </div>
+  <div class="pricing-grid">
+
+    <div class="price-card">
+      <div class="price-plan">Starter</div>
+      <div class="price-amount">
+        <span class="currency">Rp</span>
+        <span class="amount">900rb</span>
+        <span class="period">/ bulan</span>
+      </div>
+      <p class="price-desc">Cocok untuk warung dan usaha kecil yang baru memulai digitalisasi.</p>
+      <hr class="price-divider">
+      <ul class="price-features">
+        <li><span class="check">✓</span> Dashboard penjualan</li>
+        <li><span class="check">✓</span> Manajemen menu (maks. 20)</li>
+        <li><span class="check">✓</span> Konfirmasi order</li>
+        <li><span class="check-x">✗</span> <span style="color:#94A3B8">Laporan transaksi lanjutan</span></li>
+        <li><span class="check-x">✗</span> <span style="color:#94A3B8">Akses multi-pengguna</span></li>
+      </ul>
+      <a href="https://wa.me/6285870195221?text=Halo%2C%20saya%20tertarik%20paket%20Starter%20Just%20Add" class="price-btn" target="_blank">Pilih Starter</a>
+    </div>
+
+    <div class="price-card popular">
+      <div class="popular-badge">⭐ Paling Populer</div>
+      <div class="price-plan">Pro</div>
+      <div class="price-amount">
+        <span class="currency">Rp</span>
+        <span class="amount">4.2jt</span>
+        <span class="period">/ bulan</span>
+      </div>
+      <p class="price-desc">Untuk restoran berkembang yang butuh fitur lengkap dan integrasi penuh.</p>
+      <hr class="price-divider">
+      <ul class="price-features">
+        <li><span class="check">✓</span> Semua fitur Starter</li>
+        <li><span class="check">✓</span> Menu tidak terbatas</li>
+        <li><span class="check">✓</span> Laporan transaksi lengkap</li>
+        <li><span class="check">✓</span> Manajemen material & stok</li>
+        <li><span class="check">✓</span> Akses multi-pengguna</li>
+      </ul>
+      <a href="https://wa.me/6285870195221?text=Halo%2C%20saya%20tertarik%20paket%20Pro%20Just%20Add" class="price-btn filled" target="_blank">Pilih Pro</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price-plan">Enterprise</div>
+      <div class="price-amount">
+        <span class="amount" style="font-size:2rem;">Custom</span>
+      </div>
+      <p class="price-desc">Solusi khusus untuk restoran berantai dan bisnis skala besar dengan kebutuhan kustom.</p>
+      <hr class="price-divider">
+      <ul class="price-features">
+        <li><span class="check">✓</span> Semua fitur Pro</li>
+        <li><span class="check">✓</span> Integrasi sistem eksternal</li>
+        <li><span class="check">✓</span> Dedicated support</li>
+        <li><span class="check">✓</span> Onboarding & pelatihan tim</li>
+        <li><span class="check">✓</span> SLA & jaminan uptime</li>
+      </ul>
+      <a href="https://wa.me/6285870195221?text=Halo%2C%20saya%20ingin%20diskusi%20paket%20Enterprise%20Just%20Add" class="price-btn" target="_blank">Hubungi Kami</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="tim">
+  <div style="text-align: center;">
+    <div class="section-tag">Tim Pengembang</div>
+    <h2 class="section-title" style="max-width: 480px; margin: 0 auto 1rem;">Dibuat dengan <em>Penuh Dedikasi</em></h2>
+    <p class="section-sub" style="margin: 0 auto;">Dua pengembang di balik Just Add yang membangun sistem ini dari nol.</p>
+  </div>
+  <div class="team-grid">
+
+    <div class="team-card">
+      <div class="team-avatar">S</div>
+      <div class="team-name">Sherly Rahma Maulida</div>
+      <div class="team-role">Frontend Developer</div>
+      <p class="team-desc">Bertanggung jawab atas tampilan, dashboard, dan pengalaman pengguna aplikasi Just Add.</p>
+      <div class="team-skills">
+        <span class="team-skill">React</span>
+        <span class="team-skill">Tailwind</span>
+        <span class="team-skill">UI/UX</span>
+      </div>
+    </div>
+
+    <div class="team-card">
+      <div class="team-avatar">K</div>
+      <div class="team-name">Kevin firdaus Putra Pratama</div>
+      <div class="team-role">Backend Developer</div>
+      <p class="team-desc">Merancang dan membangun API, database, serta seluruh logika bisnis di balik sistem Just Add.</p>
+      <div class="team-skills">
+        <span class="team-skill">Node.js</span>
+        <span class="team-skill">MySQL</span>
+        <span class="team-skill">REST API</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <h2>Siap Membawa Restoran Anda ke <em>Level Berikutnya?</em></h2>
+  <p>Bergabung dengan ratusan restoran yang telah mempercayakan operasional mereka kepada Just Add.</p>
+  <div class="cta-buttons">
+    <a href="https://vin178.github.io/JustAdd/" class="btn-cta-light">Mulai Uji Coba Gratis</a>
+    <a href="https://wa.me/6285870195221?text=Halo%2C%20saya%20ingin%20bertanya%20tentang%20Just%20Add" class="btn-cta-ghost" target="_blank" rel="noopener noreferrer">Hubungi Kami</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Just<span>Add</span></div>
+  <p>© 2026 JustAdd. Sistem Manajemen Restoran Modern.</p>
+  <div class="footer-links">
+    <a href="#">Frontend</a>
+    <a href="#">Backend</a>
+    <a href="#">Dokumentasi</a>
+  </div>
+</footer>
+
+</body>
+</html>
